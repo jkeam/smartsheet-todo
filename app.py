@@ -11,7 +11,7 @@ def main() -> None:
     table = db.find_table("Todo")
     print(f"The sheet {table.name} has {table.row_count} rows")
     print(table.title_to_id)
-    # print(list(map(lambda x: x.id, table.rows)))
+    print({str(todo) for todo in Todo.rows(table)})
 
     # create
     # todo = Todo(table, "test1", date(2023, 11, 10))
