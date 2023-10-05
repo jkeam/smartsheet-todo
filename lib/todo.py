@@ -2,7 +2,15 @@ from smartsheet import Smartsheet
 from smartsheet.models import Sheet, Row
 from datetime import date
 from typing import List, Self
+from enum import Enum
 from . import Table
+
+
+class TodoFieldNames(Enum):
+  """ Todo field names """
+  TASK_NAME = "TaskName"
+  DUE_DATE = "DueDate"
+  ID = "Id"
 
 class Todo:
   """ Todo """
@@ -18,9 +26,9 @@ class Todo:
     return f"Todo: {{ id: {self.id.display_value}, row_id: {self.row_id} }}"
 
   def save(self) -> None:
-    data = { "TaskName": self.task }
+    data = { TodoFieldNames.TASK_NAME.value: self.task }
     if self.due_date is not None:
-        data["DueDate"] = self.due_date
+        data[TodoFieldNames.DUE_DATE.value] = self.due_date
     self.table.insert_row(data)
 
   def delete(self) -> None:
@@ -35,8 +43,8 @@ class Todo:
     id_lookup = table.title_to_id
     return Todo(
       table,
-      task=row.get_column(id_lookup["TaskName"]),
-      due_date=row.get_column(id_lookup["DueDate"]),
-      id=row.get_column(id_lookup["Id"]),
+      task=row.get_column(id_lookup[TodoFieldNames.TASK_NAME.value]),
+      due_date=row.get_column(id_lookup[TodoFieldNames.DUE_DATE.value]),
+      id=row.get_column(id_lookup[TodoFieldNames.ID.value]),
       row_id=row.id
     )
