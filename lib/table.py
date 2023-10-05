@@ -3,7 +3,13 @@ from smartsheet.models import Sheet, DateObjectValue
 from smartsheet.sheets import Sheets
 from smartsheet.models.enums.column_type import ColumnType
 from typing import List, Any
+from enum import Enum
 from datetime import date
+
+class TableObjectFieldNames(Enum):
+  """ Cell object field names """
+  OBJECT_TYPE = "objectType"
+  VALUE = "value"
 
 class Table:
   """ Represents table """
@@ -24,7 +30,7 @@ class Table:
 
       if isinstance(col_value, date):
         val = col_value.strftime('%m/%d/%Y')
-        new_cell.object_value = {"objectType": "DATE", "value": val}
+        new_cell.object_value = {TableObjectFieldNames.OBJECT_TYPE.value: ColumnType.DATE.name, TableObjectFieldNames.VALUE.value: val}
       else:
         new_cell.value = col_value
       new_row.cells.append(new_cell)
