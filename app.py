@@ -68,11 +68,14 @@ def main(table_name:str=None) -> None:
             case "set":
                 id = None
                 if len(commands) == 3:
-                    due_date = parse_arg(commands[2], "due_date", False)
                     found = find_matching(db, commands[1], table_name)
                     if found is not None:
-                        found.set_due_date_as_str(due_date)
-                        found.save()
+                        due_date = parse_arg(commands[2], "due_date", True)
+                        task = parse_arg(commands[2], "task", True)
+                        if due_date is not None:
+                            found.update_due_date_as_str(due_date)
+                        elif task is not None:
+                            found.update_task(task)
                     else:
                         print(f"Unable to find with id {commands[1]}")
                 else:

@@ -103,7 +103,7 @@ class Todo:
     self.completed_at = None
     self.table.update_field(self.row.id, TodoFieldNames.COMPLETED_AT.value, self.completed_at)
 
-  def set_due_date_as_str(self, due_date:str) -> None:
+  def update_due_date_as_str(self, due_date:str) -> None:
     """ Set due date """
     if self.row is None or self.row.id is None:
       print("Unable to mark, missing row id")
@@ -113,6 +113,15 @@ class Todo:
     else:
       self.due_date = None
     self.table.update_field(self.row.id, TodoFieldNames.DUE_DATE.value, self.due_date)
+
+  def update_task(self, task:str) -> None:
+    """ Set task """
+    if self.row is None or self.row.id is None:
+      print("Unable to mark, missing row id")
+      return
+    if task is not None and task != "":
+      self.task = task
+      self.table.update_field(self.row.id, TodoFieldNames.TASK_NAME.value, self.task)
 
   @staticmethod
   def find_by_id(table:Table, id:str) -> Self:
