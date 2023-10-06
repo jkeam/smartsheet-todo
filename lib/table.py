@@ -1,5 +1,6 @@
 from smartsheet import Smartsheet
 from smartsheet.models import Sheet, DateObjectValue
+from smartsheet.models.row import Row
 from smartsheet.sheets import Sheets
 from smartsheet.models.enums.column_type import ColumnType
 from typing import List, Any
@@ -54,3 +55,19 @@ class Table:
 
   def delete_row(self, ids:List[str]) -> None:
     self.sheet.delete_rows(ids)
+
+  def find_by_id(self, class_obj:object, field_names:dict[str, str], id:str) -> object:
+    all_rows = self.map_rows(class_obj, field_names)
+    return next(x for x in all_rows if x.id == id)
+
+  def map_rows(self, class_obj:object, field_names:dict[str, str]) -> List[object]:
+    return list(map(lambda x: self._map(class_obj, field_names, x), self.rows))
+
+  def _map(self, class_obj:object, field_names:dict[str, str], row:Row) -> object:
+    id_lookup = self.title_to_id
+    todo = class_obj(self)
+    todo.table = self
+    todo.row = row
+    for key, value in field_names.items():
+      setattr(todo, value, row.get_column(id_lookup[key]))
+    return todo

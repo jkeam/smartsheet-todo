@@ -15,45 +15,79 @@ class TodoFieldNames(Enum):
 class Todo:
   """ Todo """
 
-  def __init__(self, table:Table, task:str=None, due_date:date=None) -> None:
-    self.table = table
-    self._task = None
-    self._due_date = None
-    self._id = None
-    self.task = task
-    self.due_date = due_date
+  def __init__(self, table:Table=None, task:str=None, due_date:date=None) -> None:
     self.id = None
     self.row_id = None
     self.row = None
-    self.completed_at = None
-    self._completed_at = None
-
-  def from_smartsheets(self, _task:str=None, _due_date:date=None, _completed_at:date=None, _id:str=None, row:object=None) -> Self:
-    self._task = _task
-    self.task = _task.display_value
-    self._id = _id
-    self.id = _id.display_value
-    self._due_date = _due_date
-    if _due_date.value is not None and _completed_at.value != "":
-      self.due_date = datetime.strptime(_due_date.value, '%Y-%m-%d').date()
-    else:
-      self.due_date = None
-    self.row = row
-    self.row_id = row.id
-    self._completed_at = _completed_at
-    if _completed_at.value is not None and _completed_at.value != "":
-      self.completed_at = datetime.strptime(_completed_at.value, '%Y-%m-%d').date()
-    else:
-      self.completed_at = None
-    return self
+    self.task_object = None
+    self.due_date_object = None
+    self.completed_at_object = None
+    self.id_object = None
+    self.table = table
+    self.task = task
+    self.due_date = due_date
 
   def __str__(self) -> str:
     return f"Todo: {{ id: {self.id}, row_id: {self.row_id} }}"
 
+  @property
+  def id_object(self):
+      return self._id_object
+
+  @id_object.setter
+  def id_object(self, value):
+    if value is not None:
+      self.id = value.display_value
+    self._id_object = value
+
+  @property
+  def task_object(self):
+      return self._task_object
+
+  @task_object.setter
+  def task_object(self, value):
+    if value is not None:
+      self.task = value.display_value
+    self._task_object = value
+
+  @property
+  def row(self):
+      return self._row
+
+  @row.setter
+  def row(self, value):
+    if value is not None:
+      self.row_id = value.id
+    self._row = value
+
+  @property
+  def due_date_object(self):
+      return self._due_date_object
+
+  @due_date_object.setter
+  def due_date_object(self, value):
+    self._due_date_object = value
+    if value is not None and value.value is not None and value.value != "":
+      self.due_date = datetime.strptime(value.value, '%Y-%m-%d').date()
+    else:
+      self.due_date = None
+
+  @property
+  def completed_at_object(self):
+      return self._completed_at_object
+
+  @completed_at_object.setter
+  def completed_at_object(self, value):
+    self._completed_at_object = value
+    if value is not None and value.value is not None and value.value != "":
+      self.completed_at = datetime.strptime(value.value, '%Y-%m-%d').date()
+    else:
+      self.completed_at = None
+
   def save(self) -> None:
     data = { TodoFieldNames.TASK_NAME.value: self.task }
     if self.due_date is not None:
-        data[TodoFieldNames.DUE_DATE.value] = self.due_date
+      data[TodoFieldNames.DUE_DATE.value] = self.due_date
     self.table.insert_row(data)
 
   def delete(self) -> None:
@@ -71,21 +105,14 @@ class Todo:
     self.table.update_field(self.row_id, TodoFieldNames.COMPLETED_AT.value, self.completed_at)
 
   @staticmethod
-  def find_by_id(table:Table, id:str) -> Self:
-    return next(x for x in Todo.rows(table) if x.id == id)
+  def field_names() -> List[str]:
+    return [TodoFieldNames.TASK_NAME.value, TodoFieldNames.DUE_DATE.value, TodoFieldNames.ID.value, TodoFieldNames.COMPLETED_AT.value]
 
   @staticmethod
-  def rows(table:Table) -> List[Self]:
-    return list(map(lambda x: Todo._map(table, x), table.rows))
-
-  @staticmethod
-  def _map(table:Table, row:Row) -> Self:
-    id_lookup = table.title_to_id
-    todo = Todo(table)
-    return todo.from_smartsheets(
-      _task=row.get_column(id_lookup[TodoFieldNames.TASK_NAME.value]),
-      _due_date=row.get_column(id_lookup[TodoFieldNames.DUE_DATE.value]),
-      _completed_at=row.get_column(id_lookup[TodoFieldNames.COMPLETED_AT.value]),
-      _id=row.get_column(id_lookup[TodoFieldNames.ID.value]),
-      row=row
-    )
+  def field_name_mappings() -> dict[str, str]:
+    return {
+      TodoFieldNames.TASK_NAME.value: "task_object",
+      TodoFieldNames.DUE_DATE.value: "due_date_object",
+      TodoFieldNames.ID.value: "id_object",
+      TodoFieldNames.COMPLETED_AT.value: "completed_at_object"
+    }
