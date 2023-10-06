@@ -17,7 +17,6 @@ class Todo:
 
   def __init__(self, table:Table=None, task:str=None, due_date:date=None) -> None:
     self.id = None
-    self.row_id = None
     self.row = None
     self.task_object = None
     self.due_date_object = None
@@ -28,7 +27,7 @@ class Todo:
     self.due_date = due_date
 
   def __str__(self) -> str:
-    return f"Todo: {{ id: {self.id}, row_id: {self.row_id} }}"
+    return f"Todo: {{ id: {self.id}, task: {self.task}, due_date: {self.due_date}, completed_at: {self.completed_at} }}"
 
   @property
   def id_object(self):
@@ -49,16 +48,6 @@ class Todo:
     if value is not None:
       self.task = value.display_value
     self._task_object = value
-
-  @property
-  def row(self):
-      return self._row
-
-  @row.setter
-  def row(self, value):
-    if value is not None:
-      self.row_id = value.id
-    self._row = value
 
   @property
   def due_date_object(self):
@@ -91,25 +80,41 @@ class Todo:
     self.table.insert_row(data)
 
   def delete(self) -> None:
-    if self.row_id is None:
-      print("Unable to delete, missing row_id")
+    if self.row is None or self.row.id is None:
+      print("Unable to delete, missing row id")
     else:
-      self.table.delete_row([self.row_id])
+      self.table.delete_row([self.row.id])
 
   def finish(self) -> None:
+    """ Mark as finished """
+    if self.row is None or self.row.id is None:
+      print("Unable to mark, missing row id")
+      return
     self.completed_at = datetime.now().date()
-    self.table.update_field(self.row_id, TodoFieldNames.COMPLETED_AT.value, self.completed_at)
+    self.table.update_field(self.row.id, TodoFieldNames.COMPLETED_AT.value, self.completed_at)
 
   def unfinish(self) -> None:
+    """ Mark as not finished """
+    if self.row is None or self.row.id is None:
+      print("Unable to mark, missing row id")
+      return
     self.completed_at = None
-    self.table.update_field(self.row_id, TodoFieldNames.COMPLETED_AT.value, self.completed_at)
+    self.table.update_field(self.row.id, TodoFieldNames.COMPLETED_AT.value, self.completed_at)
 
-  @staticmethod
-  def field_names() -> List[str]:
-    return [TodoFieldNames.TASK_NAME.value, TodoFieldNames.DUE_DATE.value, TodoFieldNames.ID.value, TodoFieldNames.COMPLETED_AT.value]
+  def set_due_date_as_str(self, due_date:str) -> None:
+    """ Set due date """
+    if self.row is None or self.row.id is None:
+      print("Unable to mark, missing row id")
+      return
+    if due_date is not None and due_date != "":
+      self.due_date = datetime.strptime(due_date, '%Y-%m-%d').date()
+    else:
+      self.due_date = None
+    self.table.update_field(self.row.id, TodoFieldNames.DUE_DATE.value, self.due_date)
 
   @staticmethod
   def field_name_mappings() -> dict[str, str]:
+    """ External to internal field names """
     return {
       TodoFieldNames.TASK_NAME.value: "task_object",
       TodoFieldNames.DUE_DATE.value: "due_date_object",

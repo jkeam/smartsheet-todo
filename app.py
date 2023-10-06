@@ -51,13 +51,34 @@ def main(table_name:str=None) -> None:
                 command = "quit"
             case "rm":
                 found = find_matching(db, commands[1], table_name)
-                found.delete()
+                if found is not None:
+                    found.delete()
+                else:
+                    print(f"Unable to find with id {commands[1]}")
             case "finish":
                 found = find_matching(db, commands[1], table_name)
-                found.finish()
+                if found is not None:
+                    found.finish()
+                else:
+                    print(f"Unable to find with id {commands[1]}")
             case "unfinish":
                 found = find_matching(db, commands[1], table_name)
-                found.unfinish()
+                if found is not None:
+                    found.unfinish()
+                else:
+                    print(f"Unable to find with id {commands[1]}")
+            case "set":
+                id = None
+                if len(commands) == 3:
+                    due_date = parse_arg(commands[2], "due_date", False)
+                    found = find_matching(db, commands[1], table_name)
+                    if found is not None:
+                        found.set_due_date_as_str(due_date)
+                        found.save()
+                    else:
+                        print(f"Unable to find with id {commands[1]}")
+                else:
+                    print("You need the id and due_date")
             case "create":
                 task = None
                 due_date = None
@@ -81,12 +102,13 @@ def main(table_name:str=None) -> None:
                     todo = Todo(table, task, due_date)
                     todo.save()
             case _:
-                help = ("Commands\n"
-                    "\tls - list all todos\n"
-                    "\tcreate task:foo due_date:2023-12-12 - create todo\n"
-                    "\trm <id> - delete todo",
-                    "\tfinish <id> - mark as completed",
-                    "\tunfinish <id> - mark as uncompleted")
+                help = ('''Commands:
+    ls - list all todos
+    create task:foo due_date:2023-12-12 - create todo
+    set <id> due_date:2023-12-12 - set due date
+    rm <id> - delete todo
+    finish <id> - mark as completed
+    unfinish <id> - mark as uncompleted''')
                 print(help)
 
 if __name__ == "__main__":

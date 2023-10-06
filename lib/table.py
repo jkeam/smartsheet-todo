@@ -57,17 +57,19 @@ class Table:
     self.sheet.delete_rows(ids)
 
   def find_by_id(self, class_obj:object, field_names:dict[str, str], id:str) -> object:
-    all_rows = self.map_rows(class_obj, field_names)
-    return next(x for x in all_rows if x.id == id)
+    for x in self.map_rows(class_obj, field_names):
+      if x.id == id:
+        return x
+    return None
 
   def map_rows(self, class_obj:object, field_names:dict[str, str]) -> List[object]:
     return list(map(lambda x: self._map(class_obj, field_names, x), self.rows))
 
   def _map(self, class_obj:object, field_names:dict[str, str], row:Row) -> object:
     id_lookup = self.title_to_id
-    todo = class_obj(self)
-    todo.table = self
-    todo.row = row
+    x = class_obj(self)
+    x.table = self
+    x.row = row
     for key, value in field_names.items():
-      setattr(todo, value, row.get_column(id_lookup[key]))
-    return todo
+      setattr(x, value, row.get_column(id_lookup[key]))
+    return x
