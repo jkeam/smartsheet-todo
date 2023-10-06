@@ -25,8 +25,7 @@ def parse_arg(part:str, field_name:str, optional:bool) -> None:
     return None
 
 def find_matching(db:Database, id:str, table_name:str) -> Todo:
-    table = db.find_table(table_name)
-    return table.find_by_id(Todo, Todo.field_name_mappings(), id)
+    return Todo.find_by_id(db.find_table(table_name), id)
 
 def main(table_name:str=None) -> None:
     if table_name is None:
@@ -42,11 +41,10 @@ def main(table_name:str=None) -> None:
         command = commands[0]
         match command:
             case "list" | "ls":
-                table = db.find_table(table_name)
-                rows = table.map_rows(Todo, Todo.field_name_mappings())
-                l = list(map(lambda todo: [str(todo.id), str(todo.task), str(todo.due_date), str(todo.completed_at)], rows))
-                l.insert(0, ["Id", "Task", "Due_Date", "Completed_At"])
-                print_table(l)
+                rows = Todo.rows(db.find_table(table_name))
+                todos = list(map(lambda todo: [str(todo.id), str(todo.task), str(todo.due_date), str(todo.completed_at)], rows))
+                todos.insert(0, ["Id", "Task", "Due_Date", "Completed_At"])
+                print_table(todos)
             case "exit" | "quit":
                 command = "quit"
             case "rm":

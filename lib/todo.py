@@ -74,12 +74,14 @@ class Todo:
       self.completed_at = None
 
   def save(self) -> None:
+    """ Save todo """
     data = { TodoFieldNames.TASK_NAME.value: self.task }
     if self.due_date is not None:
       data[TodoFieldNames.DUE_DATE.value] = self.due_date
     self.table.insert_row(data)
 
   def delete(self) -> None:
+    """ Delete todo """
     if self.row is None or self.row.id is None:
       print("Unable to delete, missing row id")
     else:
@@ -113,7 +115,22 @@ class Todo:
     self.table.update_field(self.row.id, TodoFieldNames.DUE_DATE.value, self.due_date)
 
   @staticmethod
-  def field_name_mappings() -> dict[str, str]:
+  def find_by_id(table:Table, id:str) -> Self:
+    """ Find todo by id """
+    if table is not None:
+      return table.find_by_id(Todo, Todo._field_name_mappings(), id)
+    return None
+
+  @staticmethod
+  def rows(table:Table) -> List[Self]:
+    """ Get all rows """
+    if table is not None:
+      return table.map_rows(Todo, Todo._field_name_mappings())
+    return None
+
+  """ Helper Methods """
+  @staticmethod
+  def _field_name_mappings() -> dict[str, str]:
     """ External to internal field names """
     return {
       TodoFieldNames.TASK_NAME.value: "task_object",
