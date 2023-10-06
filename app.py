@@ -25,9 +25,7 @@ def parse_arg(part:str, field_name:str, optional:bool) -> None:
     return None
 
 def find_matching(db:Database, id:str, table_name:str) -> Todo:
-    table = db.find_table(table_name)
-    found = next(x for x in Todo.rows(table) if x.id == id)
-    return found
+    return Todo.find_by_id(db.find_table(table_name), id)
 
 def main(table_name:str=None) -> None:
     if table_name is None:
@@ -67,36 +65,27 @@ def main(table_name:str=None) -> None:
                         task = parse_arg(commands[2], "task", True)
                     if task is None:
                         print("task is required")
-
                     due_date = parse_arg(commands[1], "due_date", True)
                     if due_date is None:
                         due_date = parse_arg(commands[2], "due_date", True)
                     # turning this off in case we add more args later
                     # if due_date is None:
                         # print("due_date is required")
-
                 elif len(commands) == 2:
                     task = parse_arg(commands[1], "task", False)
                 else:
                     print("You need task and optionally due_date")
-
                 if task is not None:
                     todo = Todo(table, task, due_date)
                     todo.save()
             case _:
                 help = ("Commands\n"
                     "\tls - list all todos\n"
-                    "\tcreate task:foo due_date:2023-12-12 - create todo")
+                    "\tcreate task:foo due_date:2023-12-12 - create todo\n"
+                    "\trm <id> - delete todo",
+                    "\tfinish <id> - mark as completed",
+                    "\tunfinish <id> - mark as uncompleted")
                 print(help)
-
-    # print(f"The sheets are {', '.join(db.list_tables())}")
-    # print(f"The sheet {table.name} has {table.row_count} rows")
-    # print(table.title_to_id)
-
-    # delete
-    # todo = Todo(table)
-    # todo.id = "8538751117332356"
-    # todo.delete()
 
 if __name__ == "__main__":
     main(environ.get("SHEET_NAME", None))

@@ -71,6 +71,10 @@ class Todo:
     self.table.update_field(self.row_id, TodoFieldNames.COMPLETED_AT.value, self.completed_at)
 
   @staticmethod
+  def find_by_id(table:Table, id:str) -> Self:
+    return next(x for x in Todo.rows(table) if x.id == id)
+
+  @staticmethod
   def rows(table:Table) -> List[Self]:
     return list(map(lambda x: Todo._map(table, x), table.rows))
 
