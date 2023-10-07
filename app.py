@@ -28,10 +28,10 @@ def main(table_name:str|None=None) -> None:
                 Util.print_table(todos)
             case "exit" | "quit":
                 command = "quit"
-            case "rm" | "finish" | "unfinish":
+            case "rm" | "finish" | "unfinish" | "delete" | "remove":
                 found = find_matching(db, commands[1], table_name)
                 if found is not None:
-                    if command == "rm":
+                    if command == "rm" or command == "remove":
                         command = "delete"
                     methodcaller(command)(found)
                 else:
