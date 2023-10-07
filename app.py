@@ -25,11 +25,7 @@ def main(table_name:str|None=None) -> None:
         command = commands[0]
         match command:
             case "list" | "ls":
-                rows = Todo.rows(db.find_table(table_name))
-                if rows is None:
-                    continue
-                todos = list(map(lambda todo: [str(todo.id), str(todo.task), str(todo.due_date), str(todo.completed_at)], rows))
-                todos.insert(0, ["Id", "Task", "Due_Date", "Completed_At"])
+                todos = Todo.create_print_table(db.find_table(table_name))
                 Util.print_table(todos)
             case "exit" | "quit":
                 command = "quit"

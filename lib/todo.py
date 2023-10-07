@@ -1,5 +1,6 @@
 from datetime import date, datetime
 from enum import Enum
+from typing import List
 from . import Table
 
 class TodoFieldNames(Enum):
@@ -128,11 +129,14 @@ class Todo:
     return None
 
   @staticmethod
-  def rows(table:Table):
-    """ Get all rows """
-    if table is not None:
-      return table.map_rows(Todo, Todo._field_name_mappings())
-    return None
+  def create_print_table(table:Table) -> List[List[str]]:
+    rows = Todo._rows(table)
+    if rows is None:
+        todos = []
+    else:
+        todos = list(map(lambda todo: [str(todo.id), str(todo.task), str(todo.due_date), str(todo.completed_at)], rows))
+    todos.insert(0, ["Id", "Task", "Due_Date", "Completed_At"])
+    return todos
 
   """ Helper Methods """
   @staticmethod
@@ -144,3 +148,10 @@ class Todo:
       TodoFieldNames.ID.value: "id_object",
       TodoFieldNames.COMPLETED_AT.value: "completed_at_object"
     }
+
+  @staticmethod
+  def _rows(table:Table):
+    """ Get all rows """
+    if table is not None:
+      return table.map_rows(Todo, Todo._field_name_mappings())
+    return None

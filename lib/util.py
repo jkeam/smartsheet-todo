@@ -4,7 +4,7 @@ class Util:
     """ Utility object """
 
     @staticmethod
-    def print_table(table:List) -> None:
+    def print_table(table:List[List[str]]) -> None:
         longest_cols = [
             (max([len(str(row[i])) for row in table]) + 3)
             for i in range(len(table[0]))
