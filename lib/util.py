@@ -21,6 +21,8 @@ class Util:
             parts = parts.split(':')
             key = parts[0]
             rest = ":".join(parts[1:])
+            if len(rest) == 0:
+                continue
             if rest[0] == "'":
                 separator = "'"
                 rest = "".join(rest[1:])

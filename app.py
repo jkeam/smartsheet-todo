@@ -28,6 +28,12 @@ def main(table_name:str|None=None) -> None:
                 Util.print_table(todos)
             case "exit" | "quit":
                 command = "quit"
+            case "see":
+                found = find_matching(db, commands[1], table_name)
+                if found is not None:
+                    print(found.pretty_str())
+                else:
+                    print(f"Unable to find with id {commands[1]}")
             case "rm" | "finish" | "unfinish" | "delete" | "remove":
                 found = find_matching(db, commands[1], table_name)
                 if found is not None:
@@ -48,10 +54,13 @@ def main(table_name:str|None=None) -> None:
                 if due_date is None:
                     due_date = args.get("date", None)
                 task = args.get("task", None)
+                notes = args.get("notes", None)
                 if due_date is not None:
                     found.update_due_date_as_str(due_date)
                 if task is not None:
                     found.update_task(task)
+                if notes is not None:
+                    found.update_notes(notes)
             case "create":
                 args = Util.parse_args(" ".join(commands[1:]))
                 due_date = args.get("due_date", None)
@@ -75,8 +84,11 @@ def main(table_name:str|None=None) -> None:
             case _:
                 help = ('''Commands:
     ls - list all todos
+    see <id> - see the todo
     create task:foo due_date:2023-12-12 - create todo
     set <id> due_date:2023-12-12 - set due date
+    set <id> task:"some task" - set task
+    set <id> notes:"some notes" - set notes
     rm <id> - delete todo
     finish <id> - mark as completed
     unfinish <id> - mark as uncompleted

@@ -9,6 +9,7 @@ class TodoFieldNames(Enum):
   DUE_DATE = "DueDate"
   ID = "Id"
   COMPLETED_AT = "CompletedAt"
+  NOTES = "Notes"
 
 class Todo:
   """ Todo """
@@ -20,12 +21,22 @@ class Todo:
     self.due_date_object = None
     self.completed_at_object = None
     self.id_object = None
+    self.notes_object = None
     self.table = table
     self.task = task
     self.due_date = due_date
+    self.notes = None
 
   def __str__(self) -> str:
-    return f"Todo: {{ id: {self.id}, task: {self.task}, due_date: {self.due_date}, completed_at: {self.completed_at} }}"
+      return f"Todo: {{ id: {self.id}, task: {self.task}, due_date: {self.due_date}, completed_at: {self.completed_at}, notes: {self.notes} }}"
+
+  def pretty_str(self) -> str:
+    return (f'''Todo
+    id: {self.id}
+    task: {self.task}
+    due_date: {self.due_date}
+    completed_at: {self.completed_at}
+    notes: {self.notes}''')
 
   @property
   def id_object(self):
@@ -70,6 +81,16 @@ class Todo:
       self.completed_at = datetime.strptime(value.value, '%Y-%m-%d').date()
     else:
       self.completed_at = None
+
+  @property
+  def notes_object(self):
+      return self._notes_object
+
+  @notes_object.setter
+  def notes_object(self, value):
+    if value is not None:
+      self.notes = value.display_value
+    self._notes_object = value
 
   def save(self) -> None:
     """ Save todo """
@@ -121,6 +142,15 @@ class Todo:
       self.task = task
       self.table.update_field(self.row.id, TodoFieldNames.TASK_NAME.value, self.task)
 
+  def update_notes(self, notes:str) -> None:
+    """ Set notes """
+    if self.row is None or self.row.id is None:
+      print("Unable to mark, missing row id")
+      return
+    if notes is not None and notes != "":
+      self.notes = notes
+      self.table.update_field(self.row.id, TodoFieldNames.NOTES.value, self.notes)
+
   @staticmethod
   def find_by_id(table:Table, id:str):
     """ Find todo by id """
@@ -146,7 +176,8 @@ class Todo:
       TodoFieldNames.TASK_NAME.value: "task_object",
       TodoFieldNames.DUE_DATE.value: "due_date_object",
       TodoFieldNames.ID.value: "id_object",
-      TodoFieldNames.COMPLETED_AT.value: "completed_at_object"
+      TodoFieldNames.COMPLETED_AT.value: "completed_at_object",
+      TodoFieldNames.NOTES.value: "notes_object"
     }
 
   @staticmethod
