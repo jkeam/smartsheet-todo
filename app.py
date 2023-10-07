@@ -35,7 +35,7 @@ def parse_args(line:str) -> dict[str, str]:
         parts = separator.join(quotes[1:])
     return args
 
-def find_matching(db:Database, id:str, table_name:str) -> Todo:
+def find_matching(db:Database, id:str, table_name:str) -> Todo|None:
     return Todo.find_by_id(db.find_table(table_name), id)
 
 def main(table_name:str|None=None) -> None:
@@ -55,6 +55,8 @@ def main(table_name:str|None=None) -> None:
         match command:
             case "list" | "ls":
                 rows = Todo.rows(db.find_table(table_name))
+                if rows is None:
+                    continue
                 todos = list(map(lambda todo: [str(todo.id), str(todo.task), str(todo.due_date), str(todo.completed_at)], rows))
                 todos.insert(0, ["Id", "Task", "Due_Date", "Completed_At"])
                 print_table(todos)
@@ -126,7 +128,7 @@ def main(table_name:str|None=None) -> None:
     clear - clear ephemeral command history''')
                 print(help)
         if save_command:
-            history.append(commands)
+            history.append(" ".join(commands))
         else:
             save_command = True
 

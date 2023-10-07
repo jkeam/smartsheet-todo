@@ -15,7 +15,7 @@ class TodoFieldNames(Enum):
 class Todo:
   """ Todo """
 
-  def __init__(self, table:Table|None=None, task:str|None=None, due_date:date|None=None) -> None:
+  def __init__(self, table:Table, task:str|None=None, due_date:date|None=None) -> None:
     self.id = None
     self.row = None
     self.task_object = None
@@ -75,8 +75,6 @@ class Todo:
 
   def save(self) -> None:
     """ Save todo """
-    if self.table is None:
-        return
     data = { TodoFieldNames.TASK_NAME.value: self.task }
     if self.due_date is not None:
       data[TodoFieldNames.DUE_DATE.value] = self.due_date.strftime('%Y-%m-%d')
@@ -84,8 +82,6 @@ class Todo:
 
   def delete(self) -> None:
     """ Delete todo """
-    if self.table is None:
-        return
     if self.row is None or self.row.id is None:
       print("Unable to delete, missing row id")
     else:
@@ -93,8 +89,6 @@ class Todo:
 
   def finish(self) -> None:
     """ Mark as finished """
-    if self.table is None:
-        return
     if self.row is None or self.row.id is None:
       print("Unable to mark, missing row id")
       return
@@ -103,8 +97,6 @@ class Todo:
 
   def unfinish(self) -> None:
     """ Mark as not finished """
-    if self.table is None:
-        return
     if self.row is None or self.row.id is None:
       print("Unable to mark, missing row id")
       return
@@ -113,8 +105,6 @@ class Todo:
 
   def update_due_date_as_str(self, due_date:str) -> None:
     """ Set due date """
-    if self.table is None:
-        return
     if self.row is None or self.row.id is None:
       print("Unable to mark, missing row id")
       return
@@ -126,8 +116,6 @@ class Todo:
 
   def update_task(self, task:str) -> None:
     """ Set task """
-    if self.table is None:
-        return
     if self.row is None or self.row.id is None:
       print("Unable to mark, missing row id")
       return
