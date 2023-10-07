@@ -15,8 +15,6 @@ def main(table_name:str|None=None) -> None:
         return
 
     db = Database(Smartsheet())
-    table = db.find_table(table_name)
-
     command = ""
     history:List[str] = []
     save_command = True
@@ -72,7 +70,7 @@ def main(table_name:str|None=None) -> None:
                     due_date = datetime.strptime(due_date, '%Y-%m-%d').date()
                 task = args.get("task", None)
                 if task is not None:
-                    todo = Todo(table, task, due_date)
+                    todo = Todo(db.find_table(table_name), task, due_date)
                     todo.save()
                 else:
                     print("You need task and optionally due_date")
