@@ -1,12 +1,12 @@
 from dotenv import load_dotenv
 from smartsheet import Smartsheet
 from lib import Database, Todo
-from datetime import date
 from os import environ
+from datetime import datetime
 from typing import List
 load_dotenv()
 
-def print_table(table:List) -> List[List[str]]:
+def print_table(table:List) -> None:
     longest_cols = [
         (max([len(str(row[i])) for row in table]) + 3)
         for i in range(len(table[0]))
@@ -18,7 +18,7 @@ def print_table(table:List) -> List[List[str]]:
 def parse_args(line:str) -> dict[str, str]:
     args = {}
     parts = line
-    for x in range(len(line.split(':')) - 1):
+    for _ in range(len(line.split(':')) - 1):
         parts = parts.split(':')
         key = parts[0]
         rest = ":".join(parts[1:])
@@ -38,7 +38,7 @@ def parse_args(line:str) -> dict[str, str]:
 def find_matching(db:Database, id:str, table_name:str) -> Todo:
     return Todo.find_by_id(db.find_table(table_name), id)
 
-def main(table_name:str=None) -> None:
+def main(table_name:str|None=None) -> None:
     if table_name is None:
         print("Please configure a table name")
         return
@@ -99,6 +99,8 @@ def main(table_name:str=None) -> None:
                 due_date = args.get("due_date", None)
                 if due_date is None:
                     due_date = args.get("date", None)
+                if due_date is not None:
+                    due_date = datetime.strptime(due_date, '%Y-%m-%d').date()
                 task = args.get("task", None)
                 if task is not None:
                     todo = Todo(table, task, due_date)
