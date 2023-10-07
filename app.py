@@ -15,14 +15,25 @@ def print_table(table:List) -> List[List[str]]:
     for row in table:
         print(row_format.format(*row))
 
-def parse_arg(part:str, field_name:str, optional:bool) -> None:
-    parts = part.split(':')
-    if parts[0] == field_name:
-        return parts[1]
-    else:
-        if not optional:
-            print(f"{field_name} is required")
-    return None
+def parse_args(line:str) -> dict[str, str]:
+    args = {}
+    parts = line
+    for x in range(len(line.split(':')) - 1):
+        parts = parts.split(':')
+        key = parts[0]
+        rest = ":".join(parts[1:])
+        if rest[0] == "'":
+            separator = "'"
+            rest = "".join(rest[1:])
+        elif rest[0] == '"':
+            separator = '"'
+            rest = "".join(rest[1:])
+        else:
+            separator = " "
+        quotes = rest.split(separator)
+        args[key] = quotes[0]
+        parts = separator.join(quotes[1:])
+    return args
 
 def find_matching(db:Database, id:str, table_name:str) -> Todo:
     return Todo.find_by_id(db.find_table(table_name), id)
@@ -36,8 +47,10 @@ def main(table_name:str=None) -> None:
     table = db.find_table(table_name)
 
     command = ""
+    history:List[str] = []
+    save_command = True
     while command != "quit":
-        commands = str(input("> ")).strip().split(' ')
+        commands = str(input("> ")).strip().split(" ")
         command = commands[0]
         match command:
             case "list" | "ls":
@@ -66,42 +79,35 @@ def main(table_name:str=None) -> None:
                 else:
                     print(f"Unable to find with id {commands[1]}")
             case "set":
-                id = None
-                if len(commands) == 3:
-                    found = find_matching(db, commands[1], table_name)
-                    if found is not None:
-                        due_date = parse_arg(commands[2], "due_date", True)
-                        task = parse_arg(commands[2], "task", True)
-                        if due_date is not None:
-                            found.update_due_date_as_str(due_date)
-                        elif task is not None:
-                            found.update_task(task)
-                    else:
-                        print(f"Unable to find with id {commands[1]}")
-                else:
-                    print("You need the id and due_date")
+                id = commands[1]
+                found = find_matching(db, id, table_name)
+                args = parse_args(" ".join(commands[2:]))
+                due_date = args.get("due_date", None)
+                task = args.get("task", None)
+                if found is None:
+                    print(f"Unable to find with id {id}")
+                    continue
+
+                if due_date is not None:
+                    found.update_due_date_as_str(due_date)
+                if task is not None:
+                    found.update_task(task)
             case "create":
-                task = None
-                due_date = None
-                if len(commands) == 3:
-                    task = parse_arg(commands[1], "task", True)
-                    if task is None:
-                        task = parse_arg(commands[2], "task", True)
-                    if task is None:
-                        print("task is required")
-                    due_date = parse_arg(commands[1], "due_date", True)
-                    if due_date is None:
-                        due_date = parse_arg(commands[2], "due_date", True)
-                    # turning this off in case we add more args later
-                    # if due_date is None:
-                        # print("due_date is required")
-                elif len(commands) == 2:
-                    task = parse_arg(commands[1], "task", False)
-                else:
-                    print("You need task and optionally due_date")
+                args = parse_args(" ".join(commands[1:]))
+                due_date = args.get("due_date", None)
+                task = args.get("task", None)
                 if task is not None:
                     todo = Todo(table, task, due_date)
                     todo.save()
+                else:
+                    print("You need task and optionally due_date")
+            case "history":
+                save_command = False
+                for x in history:
+                    print(x)
+            case "clear" | "reset" | "clear_history" | "reset_history":
+                save_command = False
+                history.clear()
             case _:
                 help = ('''Commands:
     ls - list all todos
@@ -109,8 +115,14 @@ def main(table_name:str=None) -> None:
     set <id> due_date:2023-12-12 - set due date
     rm <id> - delete todo
     finish <id> - mark as completed
-    unfinish <id> - mark as uncompleted''')
+    unfinish <id> - mark as uncompleted
+    history - see ephemeral command history
+    clear - clear ephemeral command history''')
                 print(help)
+        if save_command:
+            history.append(commands)
+        else:
+            save_command = True
 
 if __name__ == "__main__":
     main(environ.get("SHEET_NAME", None))
