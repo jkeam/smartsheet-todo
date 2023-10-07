@@ -83,6 +83,8 @@ def main(table_name:str=None) -> None:
                 found = find_matching(db, id, table_name)
                 args = parse_args(" ".join(commands[2:]))
                 due_date = args.get("due_date", None)
+                if due_date is None:
+                    due_date = args.get("date", None)
                 task = args.get("task", None)
                 if found is None:
                     print(f"Unable to find with id {id}")
@@ -95,6 +97,8 @@ def main(table_name:str=None) -> None:
             case "create":
                 args = parse_args(" ".join(commands[1:]))
                 due_date = args.get("due_date", None)
+                if due_date is None:
+                    due_date = args.get("date", None)
                 task = args.get("task", None)
                 if task is not None:
                     todo = Todo(table, task, due_date)
