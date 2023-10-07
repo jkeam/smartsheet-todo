@@ -83,6 +83,7 @@ def main(table_name:str|None=None) -> None:
                 history.clear()
             case _:
                 help = ('''Commands:
+    help - see this help
     ls - list all todos
     see <id> - see the todo
     create task:foo due_date:2023-12-12 - create todo
