@@ -31,7 +31,7 @@ def parse_args(line:str) -> dict[str, str]:
         else:
             separator = " "
         quotes = rest.split(separator)
-        args[key] = quotes[0]
+        args[key.strip()] = quotes[0].strip()
         parts = separator.join(quotes[1:])
     return args
 
