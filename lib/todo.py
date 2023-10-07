@@ -1,7 +1,4 @@
-from smartsheet import Smartsheet
-from smartsheet.models import Sheet, Row
 from datetime import date, datetime
-from typing import List, Self
 from enum import Enum
 from . import Table
 
@@ -124,14 +121,14 @@ class Todo:
       self.table.update_field(self.row.id, TodoFieldNames.TASK_NAME.value, self.task)
 
   @staticmethod
-  def find_by_id(table:Table, id:str) -> Self|None:
+  def find_by_id(table:Table, id:str):
     """ Find todo by id """
     if table is not None:
       return table.find_by_id(Todo, Todo._field_name_mappings(), id)
     return None
 
   @staticmethod
-  def rows(table:Table) -> List[Self]|None:
+  def rows(table:Table):
     """ Get all rows """
     if table is not None:
       return table.map_rows(Todo, Todo._field_name_mappings())

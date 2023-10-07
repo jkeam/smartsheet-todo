@@ -1,11 +1,10 @@
 from smartsheet import Smartsheet
-from smartsheet.models import Sheet, DateObjectValue
+from smartsheet.models import Sheet
 from smartsheet.models.row import Row
-from smartsheet.sheets import Sheets
 from smartsheet.models.enums.column_type import ColumnType
 from typing import List, Any
 from enum import Enum
-from datetime import date, datetime
+from datetime import date
 
 class TableObjectFieldNames(Enum):
   """ Cell object field names """
@@ -37,7 +36,7 @@ class Table:
       new_row.cells.append(new_cell)
     self.sheet.add_rows([new_row])
 
-  def update_field(self, row_id:str, field_name:str, field_value:object) -> None:
+  def update_field(self, row_id:str, field_name:str, field_value:Any) -> None:
     new_row = self.smart.models.Row()
     new_row.id = row_id
     new_cell = self.smart.models.Cell()
@@ -56,16 +55,16 @@ class Table:
   def delete_row(self, ids:List[str]) -> None:
     self.sheet.delete_rows(ids)
 
-  def find_by_id(self, class_obj:object, field_names:dict[str, str], id:str) -> object:
+  def find_by_id(self, class_obj:Any, field_names:dict[str, str], id:str) -> Any:
     for x in self.map_rows(class_obj, field_names):
       if x.id == id:
         return x
     return None
 
-  def map_rows(self, class_obj:object, field_names:dict[str, str]) -> List[object]:
-    return list(map(lambda x: self._map(class_obj, field_names, x), self.rows))
+  def map_rows(self, class_obj:Any, field_names:dict[str, str]) -> List[Any]:
+    return list(map(lambda row: self._map(class_obj, field_names, row), self.rows))
 
-  def _map(self, class_obj:object, field_names:dict[str, str], row:Row) -> object:
+  def _map(self, class_obj:Any, field_names:dict[str, str], row:Row) -> Any:
     id_lookup = self.title_to_id
     x = class_obj(self)
     x.table = self
