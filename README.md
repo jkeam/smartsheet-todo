@@ -5,6 +5,12 @@ Very simple todo app using Smartsheets as the persistent store.
 ## Prerequisite
 
 1. Python 3.11+
+2. Smartsheet with the right schema (coming soon)
+3. `.env` file like the following:
+    ```env
+    SMARTSHEET_ACCESS_TOKEN=samplesamplesample
+    SHEET_NAME=Todo
+    ```
 
 ## Setup
 
