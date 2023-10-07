@@ -1,39 +1,10 @@
 from dotenv import load_dotenv
 from smartsheet import Smartsheet
-from lib import Database, Todo
+from lib import Database, Todo, Util
 from os import environ
 from datetime import datetime
 from typing import List
 load_dotenv()
-
-def print_table(table:List) -> None:
-    longest_cols = [
-        (max([len(str(row[i])) for row in table]) + 3)
-        for i in range(len(table[0]))
-    ]
-    row_format = "".join(["{:>" + str(longest_col) + "}" for longest_col in longest_cols])
-    for row in table:
-        print(row_format.format(*row))
-
-def parse_args(line:str) -> dict[str, str]:
-    args = {}
-    parts = line
-    for _ in range(len(line.split(':')) - 1):
-        parts = parts.split(':')
-        key = parts[0]
-        rest = ":".join(parts[1:])
-        if rest[0] == "'":
-            separator = "'"
-            rest = "".join(rest[1:])
-        elif rest[0] == '"':
-            separator = '"'
-            rest = "".join(rest[1:])
-        else:
-            separator = " "
-        quotes = rest.split(separator)
-        args[key.strip()] = quotes[0].strip()
-        parts = separator.join(quotes[1:])
-    return args
 
 def find_matching(db:Database, id:str, table_name:str) -> Todo|None:
     return Todo.find_by_id(db.find_table(table_name), id)
@@ -59,7 +30,7 @@ def main(table_name:str|None=None) -> None:
                     continue
                 todos = list(map(lambda todo: [str(todo.id), str(todo.task), str(todo.due_date), str(todo.completed_at)], rows))
                 todos.insert(0, ["Id", "Task", "Due_Date", "Completed_At"])
-                print_table(todos)
+                Util.print_table(todos)
             case "exit" | "quit":
                 command = "quit"
             case "rm":
@@ -83,7 +54,7 @@ def main(table_name:str|None=None) -> None:
             case "set":
                 id = commands[1]
                 found = find_matching(db, id, table_name)
-                args = parse_args(" ".join(commands[2:]))
+                args = Util.parse_args(" ".join(commands[2:]))
                 due_date = args.get("due_date", None)
                 if due_date is None:
                     due_date = args.get("date", None)
@@ -97,7 +68,7 @@ def main(table_name:str|None=None) -> None:
                 if task is not None:
                     found.update_task(task)
             case "create":
-                args = parse_args(" ".join(commands[1:]))
+                args = Util.parse_args(" ".join(commands[1:]))
                 due_date = args.get("due_date", None)
                 if due_date is None:
                     due_date = args.get("date", None)
