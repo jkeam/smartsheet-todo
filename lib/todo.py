@@ -92,6 +92,9 @@ class Todo:
       self.notes = value.display_value
     self._notes_object = value
 
+  def is_completed(self) -> bool:
+    return self.completed_at is not None
+
   def save(self) -> None:
     """ Save todo """
     data = { TodoFieldNames.TASK_NAME.value: self.task }
@@ -159,12 +162,18 @@ class Todo:
     return None
 
   @staticmethod
-  def create_print_table(table:Table) -> List[List[str]]:
+  def create_print_table(table:Table, show_all:bool=False) -> List[List[str]]:
     rows = Todo._rows(table)
     if rows is None:
         todos = []
     else:
-        todos = list(map(lambda todo: [str(todo.id), str(todo.task), str(todo.due_date), str(todo.completed_at)], rows))
+      if show_all:
+        filter_func = lambda todo: True
+      else:
+        filter_func = lambda todo: todo.is_completed()
+      todos = filter(filter_func, rows)
+      todos = list(map(lambda todo: [str(todo.id), str(todo.task), str(todo.due_date), str(todo.completed_at)], todos))
+
     todos.insert(0, ["Id", "Task", "Due_Date", "Completed_At"])
     return todos
 

@@ -23,8 +23,9 @@ def main(table_name:str|None=None) -> None:
         commands = str(input("> ")).strip().split(" ")
         command = commands[0]
         match command:
-            case "list" | "ls":
-                todos = Todo.create_print_table(db.find_table(table_name))
+            case "list" | "ls" | "la":
+                show_all = (command == "la") or (len(commands) > 1 and commands[1] == "-a")
+                todos = Todo.create_print_table(db.find_table(table_name), show_all)
                 Util.print_table(todos)
             case "exit" | "quit":
                 command = "quit"
@@ -84,7 +85,8 @@ def main(table_name:str|None=None) -> None:
             case _:
                 help = ('''Commands:
     help - see this help
-    ls - list all todos
+    ls - list completed todos
+    la - list all todos
     see <id> - see the todo
     create task:foo due_date:2023-12-12 - create todo
     set <id> due_date:2023-12-12 - set due date

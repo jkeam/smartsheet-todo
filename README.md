@@ -21,7 +21,8 @@ Very simple todo app using Smartsheets as the persistent store.
 
 ```shell
 help - see this help
-ls - list all todos
+ls - list completed todos
+la - list all todos
 see <id> - see the todo
 create task:foo due_date:2023-12-12 - create todo
 set <id> due_date:2023-12-12 - set due date
