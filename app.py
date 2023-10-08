@@ -66,7 +66,7 @@ def main(table_name:str|None=None) -> None:
                 if due_date is None:
                     due_date = args.get("date", None)
                 if due_date is not None:
-                    due_date = datetime.strptime(due_date, '%Y-%m-%d').date()
+                    due_date = Util.parse_date(due_date)
                 task = args.get("task", None)
                 if task is not None:
                     todo = Todo(db.find_table(table_name), task, due_date)

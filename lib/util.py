@@ -1,7 +1,16 @@
 from typing import List
+from datetime import datetime, date
 
 class Util:
     """ Utility object """
+
+    @staticmethod
+    def parse_date(date_str:str) -> date:
+        return datetime.strptime(date_str, '%Y-%m-%d').date()
+
+    @staticmethod
+    def date_as_str(date_obj:date) -> str:
+        return date_obj.strftime('%Y-%m-%d')
 
     @staticmethod
     def print_table(table:List[List[str]]) -> None:

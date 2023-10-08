@@ -5,6 +5,7 @@ from smartsheet.models.enums.column_type import ColumnType
 from typing import List, Any
 from enum import Enum
 from datetime import date
+from . import Util
 
 class TableObjectFieldNames(Enum):
   """ Cell object field names """
@@ -29,7 +30,7 @@ class Table:
       new_cell.column_id = self.title_to_id[col_name]
 
       if isinstance(col_value, date):
-        val = col_value.strftime('%m/%d/%Y')
+        val = Util.date_as_str(col_value)
         new_cell.object_value = {TableObjectFieldNames.OBJECT_TYPE.value: ColumnType.DATE.name, TableObjectFieldNames.VALUE.value: val}
       else:
         new_cell.value = col_value
@@ -43,7 +44,7 @@ class Table:
     new_cell.column_id = self.title_to_id[field_name]
 
     if isinstance(field_value, date):
-      val = field_value.strftime('%m/%d/%Y')
+      val = Util.date_as_str(field_value)
       new_cell.object_value = {TableObjectFieldNames.OBJECT_TYPE.value: ColumnType.DATE.name, TableObjectFieldNames.VALUE.value: val}
     elif field_value is None:
       new_cell.value = ""

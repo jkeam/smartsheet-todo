@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from enum import Enum
 from typing import List
-from . import Table
+from . import Table, Util
 
 class TodoFieldNames(Enum):
   """ Todo field names """
@@ -66,7 +66,7 @@ class Todo:
   def due_date_object(self, value):
     self._due_date_object = value
     if value is not None and value.value is not None and value.value != "":
-      self.due_date = datetime.strptime(value.value, '%Y-%m-%d').date()
+      self.due_date = Util.parse_date(value.value)
     else:
       self.due_date = None
 
@@ -78,7 +78,7 @@ class Todo:
   def completed_at_object(self, value):
     self._completed_at_object = value
     if value is not None and value.value is not None and value.value != "":
-      self.completed_at = datetime.strptime(value.value, '%Y-%m-%d').date()
+      self.completed_at = Util.parse_date(value.value)
     else:
       self.completed_at = None
 
@@ -99,7 +99,7 @@ class Todo:
     """ Save todo """
     data = { TodoFieldNames.TASK_NAME.value: self.task }
     if self.due_date is not None:
-      data[TodoFieldNames.DUE_DATE.value] = self.due_date.strftime('%Y-%m-%d')
+      data[TodoFieldNames.DUE_DATE.value] = Util.date_as_str(self.due_date)
     self.table.insert_row(data)
 
   def delete(self) -> None:
@@ -131,7 +131,7 @@ class Todo:
       print("Unable to mark, missing row id")
       return
     if due_date is not None and due_date != "":
-      self.due_date = datetime.strptime(due_date, '%Y-%m-%d').date()
+      self.due_date = Util.parse_date(due_date)
     else:
       self.due_date = None
     self.table.update_field(self.row.id, TodoFieldNames.DUE_DATE.value, self.due_date)
@@ -170,7 +170,7 @@ class Todo:
       if show_all:
         filter_func = lambda todo: True
       else:
-        filter_func = lambda todo: todo.is_completed()
+        filter_func = lambda todo: not todo.is_completed()
       todos = filter(filter_func, rows)
       todos = list(map(lambda todo: [str(todo.id), str(todo.task), str(todo.due_date), str(todo.completed_at)], todos))
 
