@@ -66,8 +66,8 @@ class Controller:
     def help(self) -> None:
         help = ('''Commands:
         help - see this help
-        ls - list completed todos
-        la - list all todos
+        ls - list uncompleted todos
+        la - list all (uncompleted and completed) todos
         see <id> - see the todo
         create task:foo due_date:2023-12-12 - create todo
         set <id> due_date:2023-12-12 - set due date
