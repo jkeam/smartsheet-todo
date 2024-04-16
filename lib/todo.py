@@ -14,7 +14,7 @@ class TodoFieldNames(Enum):
 class Todo:
   """ Todo """
 
-  def __init__(self, table:Table, task:str|None=None, due_date:date|None=None) -> None:
+  def __init__(self, table:Table, task:str|None=None, due_date:date|None=None, notes:str|None=None) -> None:
     self.id = None
     self.row = None
     self.task_object = None
@@ -25,7 +25,7 @@ class Todo:
     self.table = table
     self.task = task
     self.due_date = due_date
-    self.notes = None
+    self.notes = notes
 
   def __str__(self) -> str:
       return f"Todo: {{ id: {self.id}, task: {self.task}, due_date: {self.due_date}, completed_at: {self.completed_at}, notes: {self.notes} }}"
@@ -100,7 +100,10 @@ class Todo:
 
   def save(self) -> None:
     """ Save todo """
-    data = { TodoFieldNames.TASK_NAME.value: self.task }
+    data = {
+      TodoFieldNames.TASK_NAME.value: self.task,
+      TodoFieldNames.NOTES.value: self.notes
+    }
     if self.due_date is not None:
       data[TodoFieldNames.DUE_DATE.value] = Util.date_as_str(self.due_date)
     self.table.insert_row(data)

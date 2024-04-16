@@ -51,14 +51,15 @@ class Controller:
 
     def create(self, commands:List[str]) -> None:
         args = Util.parse_args(" ".join(commands[1:]))
+        notes = args.get("notes", None)
+        task = args.get("task", None)
         due_date = args.get("due_date", None)
         if due_date is None:
             due_date = args.get("date", None)
         if due_date is not None:
             due_date = Util.parse_date(due_date)
-        task = args.get("task", None)
         if task is not None:
-            todo = Todo(self.db.find_table(self.table_name), task, due_date)
+            todo = Todo(self.db.find_table(self.table_name), task, due_date, notes)
             todo.save()
         else:
             print("You need task and optionally due_date")
