@@ -26,7 +26,7 @@ class Util:
     def parse_args(line:str) -> dict[str, str]:
         args = {}
         parts = line
-        for _ in range(len(line.split(':')) - 1):
+        while parts != "":
             parts = parts.split(':')
             key = parts[0]
             rest = ":".join(parts[1:])
@@ -42,5 +42,5 @@ class Util:
                 separator = " "
             quotes = rest.split(separator)
             args[key.strip()] = quotes[0].strip()
-            parts = separator.join(quotes[1:])
+            parts = separator.join(quotes[1:]).strip()
         return args

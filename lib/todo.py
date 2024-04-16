@@ -31,12 +31,15 @@ class Todo:
       return f"Todo: {{ id: {self.id}, task: {self.task}, due_date: {self.due_date}, completed_at: {self.completed_at}, notes: {self.notes} }}"
 
   def pretty_str(self) -> str:
+    notes = self.notes
+    if not notes:
+      notes = ""
     return (f'''Todo
     id: {self.id}
     task: {self.task}
     due_date: {self.due_date}
     completed_at: {self.completed_at}
-    notes: {self.notes}''')
+    notes: {notes.replace(r'\n', '\n')}''')
 
   @property
   def id_object(self):
