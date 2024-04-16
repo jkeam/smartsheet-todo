@@ -70,10 +70,10 @@ class Controller:
         ls - list uncompleted todos
         la - list all (uncompleted and completed) todos
         see <id> - see the todo
-        create task:foo due_date:2023-12-12 - create todo
+        create task:foo due_date:2023-12-12 notes:"Some notes" - create todo
         set <id> due_date:2023-12-12 - set due date
-        set <id> task:"some task" - set task
-        set <id> notes:"some notes" - set notes
+        set <id> task:"Do something" - set task
+        set <id> notes:"Some notes" - set notes
         rm <id> - delete todo
         finish <id> - mark as completed
         unfinish <id> - mark as uncompleted

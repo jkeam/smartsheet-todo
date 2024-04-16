@@ -4,12 +4,12 @@ from typing import List
 from . import Table, Util
 
 class TodoFieldNames(Enum):
-  """ Todo field names """
-  TASK_NAME = "TaskName"
-  DUE_DATE = "DueDate"
-  ID = "Id"
-  COMPLETED_AT = "CompletedAt"
-  NOTES = "Notes"
+  """ Todo Schema """
+  TASK_NAME = "TaskName"        # Text/Number
+  DUE_DATE = "DueDate"          # Date
+  ID = "Id"                     # Auto Number
+  COMPLETED_AT = "CompletedAt"  # Date
+  NOTES = "Notes"               # Text/Number
 
 class Todo:
   """ Todo """
