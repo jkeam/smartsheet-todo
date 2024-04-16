@@ -177,7 +177,8 @@ class Todo:
         filter_func = lambda todo: True
       else:
         filter_func = lambda todo: not todo.is_completed()
-      todos = filter(filter_func, rows)
+      max_date = date(3000, 1, 1)
+      todos = sorted(filter(filter_func, rows), key=lambda t: max_date if t.due_date is None else t.due_date)
       todos = list(map(lambda todo: [str(todo.id), str(todo.task), str(todo.due_date), str(todo.completed_at)], todos))
 
     todos.insert(0, ["Id", "Task", "Due_Date", "Completed_At"])
