@@ -5,6 +5,8 @@ from os import environ
 from datetime import datetime
 from typing import List
 from operator import methodcaller
+# https://stackoverflow.com/questions/8469122/maximum-characters-that-can-be-stuffed-into-raw-input-in-python
+import readline  # raises the input buffer
 load_dotenv()
 
 def main(table_name:str|None=None) -> None:
