@@ -101,9 +101,10 @@ class Todo:
   def save(self) -> None:
     """ Save todo """
     data = {
-      TodoFieldNames.TASK_NAME.value: self.task,
-      TodoFieldNames.NOTES.value: self.notes
+      TodoFieldNames.TASK_NAME.value: self.task
     }
+    if self.notes is not None:
+      data[TodoFieldNames.NOTES.value]: self.notes
     if self.due_date is not None:
       data[TodoFieldNames.DUE_DATE.value] = Util.date_as_str(self.due_date)
     self.table.insert_row(data)
