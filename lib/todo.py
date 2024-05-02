@@ -28,7 +28,7 @@ class Todo:
     self.notes = notes
 
   def __str__(self) -> str:
-      return f"Todo: {{ id: {self.id}, task: {self.task}, due_date: {self.due_date}, completed_at: {self.completed_at}, notes: {self.notes} }}"
+    return f"Todo: {{ id: {self.id}, task: {self.task}, due_date: {self.due_date}, completed_at: {self.completed_at}, notes: {self.notes} }}"
 
   def pretty_str(self) -> str:
     notes = self.notes
@@ -43,7 +43,7 @@ class Todo:
 
   @property
   def id_object(self):
-      return self._id_object
+    return self._id_object
 
   @id_object.setter
   def id_object(self, value):
@@ -53,7 +53,7 @@ class Todo:
 
   @property
   def task_object(self):
-      return self._task_object
+    return self._task_object
 
   @task_object.setter
   def task_object(self, value):
@@ -63,7 +63,7 @@ class Todo:
 
   @property
   def due_date_object(self):
-      return self._due_date_object
+    return self._due_date_object
 
   @due_date_object.setter
   def due_date_object(self, value):
@@ -75,7 +75,7 @@ class Todo:
 
   @property
   def completed_at_object(self):
-      return self._completed_at_object
+    return self._completed_at_object
 
   @completed_at_object.setter
   def completed_at_object(self, value):
@@ -172,7 +172,7 @@ class Todo:
   def create_print_table(table:Table, show_all:bool=False) -> List[List[str]]:
     rows = Todo._rows(table)
     if rows is None:
-        todos = []
+      todos = []
     else:
       if show_all:
         filter_func = lambda todo: True
