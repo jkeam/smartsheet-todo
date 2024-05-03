@@ -1,3 +1,4 @@
+from smartsheet import Smartsheet
 from datetime import date, datetime
 from enum import Enum
 from typing import List
@@ -5,11 +6,16 @@ from . import Table, Util
 
 class TodoFieldNames(Enum):
   """ Todo Schema """
-  TASK_NAME = "TaskName"        # Text/Number
-  DUE_DATE = "DueDate"          # Date
-  ID = "Id"                     # Auto Number
-  COMPLETED_AT = "CompletedAt"  # Date
-  NOTES = "Notes"               # Text/Number
+  TASK_NAME = "TaskName"
+  TASK_NAME_TYPE = "TEXT_NUMBER"
+  DUE_DATE = "DueDate"
+  DUE_DATE_TYPE = "DATE"
+  ID = "Id"
+  ID_TYPE = "AUTO_NUMBER"
+  COMPLETED_AT = "CompletedAt"
+  COMPLETED_AT_TYPE = "DATE"
+  NOTES = "Notes"
+  NOTES_TYPE = "TEXT_NUMBER"
 
 class Todo:
   """ Todo """
@@ -184,6 +190,53 @@ class Todo:
 
     todos.insert(0, ["Id", "Task", "Due_Date", "Completed_At"])
     return todos
+
+  @staticmethod
+  def create_table(smart:Smartsheet, table_name:str, folder_id:str) -> Table:
+    sheet_spec = smart.models.Sheet({
+      "name": table_name,
+      "columns": [{
+        "title": TodoFieldNames.ID.value,
+        "type": "TEXT_NUMBER",
+        "systemColumnType": TodoFieldNames.ID_TYPE.value,
+        "autoNumberFormat": {
+          "startingNumber": 1
+        }
+      }, {
+        "title": TodoFieldNames.TASK_NAME.value,
+        "type": TodoFieldNames.TASK_NAME_TYPE.value,
+        "primary": True
+      }, {
+        "title": TodoFieldNames.DUE_DATE.value,
+        "type": TodoFieldNames.DUE_DATE_TYPE.value
+      }, {
+        "title": TodoFieldNames.COMPLETED_AT.value,
+        "type": TodoFieldNames.COMPLETED_AT_TYPE.value
+      }, {
+        "title": TodoFieldNames.NOTES.value,
+        "type": TodoFieldNames.NOTES_TYPE.value
+      }, {
+        "title": "ModifiedAt",
+        "type": "DATETIME",
+        "systemColumnType": "MODIFIED_DATE"
+      }, {
+        "title": "ModifiedBy",
+        "type": "CONTACT_LIST",
+        "systemColumnType": "MODIFIED_BY"
+      }, {
+        "title": "CreatedAt",
+        "type": "DATETIME",
+        "systemColumnType": "CREATED_DATE"
+      }, {
+        "title": "CreatedBy",
+        "type": "CONTACT_LIST",
+        "systemColumnType": "CREATED_BY"
+      }]
+    })
+
+    response = smart.Folders.create_sheet_in_folder(folder_id, sheet_spec)
+    new_sheet = response.result
+    return new_sheet
 
   """ Helper Methods """
   @staticmethod

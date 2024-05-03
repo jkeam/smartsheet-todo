@@ -1,15 +1,17 @@
 # Smartsheets Todo App
 
 Very simple todo app using Smartsheets as the persistent store.
+Sheet will automatically be created for you if it does not exist.
 
 ## Prerequisite
 
 1. Python 3.11+
-2. Smartsheet with the right [schema](./lib/todo.py)
-3. `.env` file like the following:
+2. `.env` file like the following,
+note that `SHEET_NAME` must be unique in the folder with `FOLDER_ID`
     ```env
     SMARTSHEET_ACCESS_TOKEN=samplesamplesample
     SHEET_NAME=Todo
+    FOLDER_ID=3734419270854532
     ```
 
 ## Setup

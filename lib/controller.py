@@ -4,9 +4,15 @@ from operator import methodcaller
 
 class Controller:
 
-    def __init__(self, db:Database, table_name:str) -> None:
+    def __init__(self, db:Database, table_name:str, folder_id:str|None=None) -> None:
         self.db = db
         self.table_name = table_name
+        self.folder_id = folder_id
+        # if folder is set and table does not exist, create sheet
+        table = self.db.find_table(self.table_name)
+        if self.folder_id and table is None:
+            print("Creating table/sheet in that folder...")
+            Todo.create_table(self.db.smart, self.table_name, self.folder_id)
 
     def list(self, commands:List[str]) -> None:
         show_all = (commands[0] == "la") or (len(commands) > 1 and commands[1] == "-a")

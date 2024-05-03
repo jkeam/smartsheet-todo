@@ -9,13 +9,13 @@ from operator import methodcaller
 import readline  # raises the input buffer
 load_dotenv()
 
-def main(table_name:str|None=None) -> None:
+def main(table_name:str|None=None, folder_id:str|None=None) -> None:
     try:
         if table_name is None:
             print("Please configure a table name")
             return
 
-        controller = Controller(Database(Smartsheet()), table_name)
+        controller = Controller(Database(Smartsheet()), table_name, folder_id)
         history:List[str] = []
         save_command = True
         command = ""
@@ -52,4 +52,4 @@ def main(table_name:str|None=None) -> None:
         return
 
 if __name__ == "__main__":
-    main(environ.get("SHEET_NAME", None))
+    main(environ.get("SHEET_NAME", None), environ.get("FOLDER_ID", None))

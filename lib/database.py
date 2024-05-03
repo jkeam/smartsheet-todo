@@ -8,10 +8,13 @@ class Database:
   def __init__(self, smart:Smartsheet) -> None:
     self.smart = smart
 
-  def find_table(self, table_name:str) -> Table:
+  def find_table(self, table_name:str) -> Table|None:
     response = self.smart.Sheets.list_sheets()
-    todo = list(filter(lambda x: x.name == table_name, response.data))[0]
-    return Table(self.smart, self.smart.Sheets.get_sheet(todo.id))
+    todos = list(filter(lambda x: x.name == table_name, response.data))
+    if len(todos):
+      todo = list(filter(lambda x: x.name == table_name, response.data))[0]
+      return Table(self.smart, self.smart.Sheets.get_sheet(todo.id))
+    return None
 
   def list_tables(self) -> List[str]:
     response = self.smart.Sheets.list_sheets()
