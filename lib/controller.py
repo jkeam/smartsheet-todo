@@ -1,4 +1,4 @@
-from . import Database, Todo, Util
+from . import Database, Todo, Util, TodoFilterType
 from typing import List
 from operator import methodcaller
 
@@ -15,8 +15,14 @@ class Controller:
             Todo.create_table(self.db.smart, self.table_name, self.folder_id)
 
     def list(self, commands:List[str]) -> None:
-        show_all = (commands[0] == "la") or (len(commands) > 1 and commands[1] == "-a")
-        todos = Todo.create_print_table(self.db.find_table(self.table_name), show_all)
+        if (commands[0] == "la") or (len(commands) > 1 and commands[1] == "-a"):
+            todo_filter = TodoFilterType.ALL
+        elif (commands[0] == "week"):
+            todo_filter = TodoFilterType.WEEK
+        else:
+            todo_filter = TodoFilterType.UNFINISHED
+
+        todos = Todo.create_print_table(self.db.find_table(self.table_name), todo_filter)
         Util.print_table(todos)
 
     def see(self, id:str) -> None:
@@ -75,6 +81,7 @@ class Controller:
         help - see this help
         ls - list uncompleted todos
         la - list all (uncompleted and completed) todos
+        week - list uncompleted todos that are due this week
         see <id> - see the todo
         create task:foo due_date:2023-12-12 notes:"Some notes" - create todo
         set <id> due_date:2023-12-12 - set due date

@@ -1,8 +1,13 @@
 from smartsheet import Smartsheet
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from enum import Enum
-from typing import List
+from typing import List, Self
 from . import Table, Util
+
+class TodoFilterType(Enum):
+  ALL = "ALL"
+  WEEK = "WEEK"
+  UNFINISHED = "UNFINISHED"
 
 class TodoFieldNames(Enum):
   """ Todo Schema """
@@ -28,10 +33,10 @@ class Todo:
     self.completed_at_object = None
     self.id_object = None
     self.notes_object = None
-    self.table = table
-    self.task = task
-    self.due_date = due_date
-    self.notes = notes
+    self.table:Table = table
+    self.task:str|None = task
+    self.due_date:date|None = due_date
+    self.notes:str|None = notes
 
   def __str__(self) -> str:
     return f"Todo: {{ id: {self.id}, task: {self.task}, due_date: {self.due_date}, completed_at: {self.completed_at}, notes: {self.notes} }}"
@@ -175,19 +180,22 @@ class Todo:
     return None
 
   @staticmethod
-  def create_print_table(table:Table, show_all:bool=False) -> List[List[str]]:
+  def create_print_table(table:Table, todo_filter:TodoFilterType=TodoFilterType.UNFINISHED) -> List[List[str]]:
+    """ Filters all elements and creates structure for the todos to be nicely printed """
     rows = Todo._rows(table)
     if rows is None:
       todos = []
     else:
-      if show_all:
-        filter_func = lambda todo: True
-      else:
-        filter_func = lambda todo: not todo.is_completed()
+      match todo_filter:
+        case TodoFilterType.ALL:
+          filter_func = lambda todo: True
+        case TodoFilterType.WEEK:
+          filter_func = Todo._week_filter
+        case TodoFilterType.UNFINISHED:
+          filter_func = lambda todo: not todo.is_completed()
       max_date = date(3000, 1, 1)
       todos = sorted(filter(filter_func, rows), key=lambda t: max_date if t.due_date is None else t.due_date)
       todos = list(map(lambda todo: [str(todo.id), str(todo.task), str(todo.due_date), str(todo.completed_at)], todos))
-
     todos.insert(0, ["Id", "Task", "Due_Date", "Completed_At"])
     return todos
 
@@ -239,6 +247,14 @@ class Todo:
     return new_sheet
 
   """ Helper Methods """
+  @staticmethod
+  def _week_filter(todo:Self) -> bool:
+    """ Things not yet done for this week """
+    now = datetime.now()
+    sunday = (now - timedelta(days = now.weekday() + 1)).date()
+    saturday = (now - timedelta(days = now.weekday() - 5)).date()
+    return todo.due_date is not None and not todo.is_completed() and todo.due_date >= sunday and todo.due_date <= saturday
+
   @staticmethod
   def _field_name_mappings() -> dict[str, str]:
     """ External to internal field names """

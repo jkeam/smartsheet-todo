@@ -25,6 +25,7 @@ note that `SHEET_NAME` must be unique in the folder with `FOLDER_ID`
 help - see this help
 ls - list uncompleted todos
 la - list all (uncompleted and completed) todos
+week - list uncompleted todos that are due this week
 see <id> - see the todo
 create task:foo due_date:2023-12-12 notes:"Some notes" - create todo
 set <id> due_date:2023-12-12 - set due date

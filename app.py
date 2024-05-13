@@ -23,7 +23,7 @@ def main(table_name:str|None=None, folder_id:str|None=None) -> None:
             commands = str(input("> ")).strip().split(" ")
             command = commands[0]
             match command:
-                case "list" | "ls" | "la":
+                case "list" | "ls" | "la" | "week":
                     controller.list(commands)
                 case "see":
                     controller.see(commands[1])
