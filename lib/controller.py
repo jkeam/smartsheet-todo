@@ -54,12 +54,15 @@ class Controller:
             due_date = args.get("date", None)
         task = args.get("task", None)
         notes = args.get("notes", None)
+        status = args.get("status", None)
         if due_date is not None:
             found.update_due_date_as_str(due_date)
         if task is not None:
             found.update_task(task)
         if notes is not None:
             found.update_notes(notes)
+        if status is not None:
+            found.update_status(status)
 
     def create(self, commands:List[str]) -> None:
         args = Util.parse_args(" ".join(commands[1:]))
@@ -87,6 +90,7 @@ class Controller:
         set <id> due_date:2023-12-12 - set due date
         set <id> task:"Do something" - set task
         set <id> notes:"Some notes" - set notes
+        set <id> status:"Backlog" - valid vales are ["Backlog", "Active Sprint", "In Progress", "Done", "OBE"]
         rm <id> - delete todo
         finish <id> - mark as completed
         unfinish <id> - mark as uncompleted

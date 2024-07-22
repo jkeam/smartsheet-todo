@@ -4,6 +4,13 @@ from enum import Enum
 from typing import List, Self
 from . import Table, Util
 
+class TodoStatusType(Enum):
+  BACKLOG = "Backlog"
+  ACTIVE_SPRINT = "Active Sprint"
+  IN_PROGRESS = "In Progress"
+  DONE = "Done"
+  OBE = "OBE"
+
 class TodoFilterType(Enum):
   ALL = "ALL"
   WEEK = "WEEK"
@@ -21,6 +28,8 @@ class TodoFieldNames(Enum):
   COMPLETED_AT_TYPE = "DATE"
   NOTES = "Notes"
   NOTES_TYPE = "TEXT_NUMBER"
+  STATUS = "Status"
+  STATUS_TYPE = "PICKLIST"
 
 class Todo:
   """ Todo """
@@ -33,10 +42,12 @@ class Todo:
     self.completed_at_object = None
     self.id_object = None
     self.notes_object = None
+    self.status_object = None
     self.table:Table = table
     self.task:str|None = task
     self.due_date:date|None = due_date
     self.notes:str|None = notes
+    self.status:str = TodoStatusType.BACKLOG.value
 
   def __str__(self) -> str:
     return f"Todo: {{ id: {self.id}, task: {self.task}, due_date: {self.due_date}, completed_at: {self.completed_at}, notes: {self.notes} }}"
@@ -50,6 +61,7 @@ class Todo:
     task: {self.task}
     due_date: {self.due_date}
     completed_at: {self.completed_at}
+    status: {self.status}
     notes: {notes.replace(r'\n', '\n')}''')
 
   @property
@@ -106,6 +118,16 @@ class Todo:
       self.notes = value.display_value
     self._notes_object = value
 
+  @property
+  def status_object(self):
+      return self._status_object
+
+  @status_object.setter
+  def status_object(self, value):
+    if value is not None:
+      self.status = value.display_value
+    self._status_object = value
+
   def is_completed(self) -> bool:
     return self.completed_at is not None
 
@@ -118,6 +140,8 @@ class Todo:
       data[TodoFieldNames.NOTES.value] = self.notes
     if self.due_date is not None:
       data[TodoFieldNames.DUE_DATE.value] = Util.date_as_str(self.due_date)
+    if self.status is not None:
+      data[TodoFieldNames.STATUS.value] = self.status
     self.table.insert_row(data)
 
   def delete(self) -> None:
@@ -172,6 +196,15 @@ class Todo:
       self.notes = notes
       self.table.update_field(self.row.id, TodoFieldNames.NOTES.value, self.notes)
 
+  def update_status(self, status:str) -> None:
+    """ Set status """
+    if self.row is None or self.row.id is None:
+      print("Unable to mark, missing row id")
+      return
+    if status is not None and status != "":
+      self.status = status
+      self.table.update_field(self.row.id, TodoFieldNames.STATUS.value, self.status)
+
   @staticmethod
   def find_by_id(table:Table, id:str):
     """ Find todo by id """
@@ -195,8 +228,8 @@ class Todo:
           filter_func = lambda todo: not todo.is_completed()
       max_date = date(3000, 1, 1)
       todos = sorted(filter(filter_func, rows), key=lambda t: max_date if t.due_date is None else t.due_date)
-      todos = list(map(lambda todo: [str(todo.id), str(todo.task), str(todo.due_date), str(todo.completed_at)], todos))
-    todos.insert(0, ["Id", "Task", "Due_Date", "Completed_At"])
+      todos = list(map(lambda todo: [str(todo.id), str(todo.task), str(todo.status), str(todo.due_date), str(todo.completed_at)], todos))
+    todos.insert(0, ["Id", "Task", "Status", "Due_Date", "Completed_At"])
     return todos
 
   @staticmethod
@@ -223,6 +256,10 @@ class Todo:
       }, {
         "title": TodoFieldNames.NOTES.value,
         "type": TodoFieldNames.NOTES_TYPE.value
+      }, {
+        "title": TodoFieldNames.STATUS.value,
+        "type": TodoFieldNames.STATUS_TYPE.value,
+        "options": [TodoStatusType.BACKLOG.value, TodoStatusType.ACTIVE_SPRINT.value, TodoStatusType.IN_PROGRESS.value, TodoStatusType.DONE.value, TodoStatusType.OBE.value]
       }, {
         "title": "ModifiedAt",
         "type": "DATETIME",
@@ -263,7 +300,8 @@ class Todo:
       TodoFieldNames.DUE_DATE.value: "due_date_object",
       TodoFieldNames.ID.value: "id_object",
       TodoFieldNames.COMPLETED_AT.value: "completed_at_object",
-      TodoFieldNames.NOTES.value: "notes_object"
+      TodoFieldNames.NOTES.value: "notes_object",
+      TodoFieldNames.STATUS.value: "status_object",
     }
 
   @staticmethod

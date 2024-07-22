@@ -7,7 +7,7 @@ Sheet will automatically be created for you if it does not exist.
 
 1. Python 3.11+
 2. `.env` file like the following,
-note that `SHEET_NAME` must be unique in the folder with `FOLDER_ID`
+note that `SHEET_NAME` must be globally unique
     ```env
     SMARTSHEET_ACCESS_TOKEN=samplesamplesample
     SHEET_NAME=Todo
@@ -31,6 +31,7 @@ create task:foo due_date:2023-12-12 notes:"Some notes" - create todo
 set <id> due_date:2023-12-12 - set due date
 set <id> task:"Do something" - update task
 set <id> notes:"Some notes" - update notes
+set <id> status:"Backlog" - valid vales are ["Backlog", "Active Sprint", "In Progress", "Done", "OBE"]
 rm <id> - delete todo
 finish <id> - mark as completed
 unfinish <id> - mark as uncompleted
