@@ -157,15 +157,19 @@ class Todo:
       print("Unable to mark, missing row id")
       return
     self.completed_at = datetime.now().date()
+    self.status = TodoStatusType.DONE.value
     self.table.update_field(self.row.id, TodoFieldNames.COMPLETED_AT.value, self.completed_at)
+    self.table.update_field(self.row.id, TodoFieldNames.STATUS.value, self.status)
 
-  def unfinish(self) -> None:
+  def unfinish(self, new_status:str=TodoStatusType.IN_PROGRESS.value) -> None:
     """ Mark as not finished """
     if self.row is None or self.row.id is None:
       print("Unable to mark, missing row id")
       return
     self.completed_at = None
+    self.status = new_status
     self.table.update_field(self.row.id, TodoFieldNames.COMPLETED_AT.value, self.completed_at)
+    self.table.update_field(self.row.id, TodoFieldNames.STATUS.value, self.status)
 
   def update_due_date_as_str(self, due_date:str) -> None:
     """ Set due date """
@@ -202,8 +206,11 @@ class Todo:
       print("Unable to mark, missing row id")
       return
     if status is not None and status != "":
-      self.status = status
-      self.table.update_field(self.row.id, TodoFieldNames.STATUS.value, self.status)
+      pre_done = [TodoStatusType.BACKLOG.value, TodoStatusType.ACTIVE_SPRINT.value, TodoStatusType.IN_PROGRESS.value]
+      if self.status == TodoStatusType.DONE.value and status in pre_done:
+        self.unfinish(status)
+      elif self.status != TodoStatusType.DONE.value and status == TodoStatusType.DONE.value:
+        self.finish()
 
   @staticmethod
   def find_by_id(table:Table, id:str):
