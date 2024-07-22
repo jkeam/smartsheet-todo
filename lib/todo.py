@@ -209,7 +209,7 @@ class Todo:
       pre_done = [TodoStatusType.BACKLOG.value, TodoStatusType.ACTIVE_SPRINT.value, TodoStatusType.IN_PROGRESS.value]
       if self.status == TodoStatusType.DONE.value and status in pre_done:
         self.unfinish(status)
-      elif self.status != TodoStatusType.DONE.value and status == TodoStatusType.DONE.value:
+      if status == TodoStatusType.DONE.value:
         self.finish()
 
   @staticmethod
